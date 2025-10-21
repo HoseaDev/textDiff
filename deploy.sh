@@ -20,10 +20,19 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+# 检测Docker Compose命令格式
+COMPOSE_CMD=""
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+else
     echo -e "${RED}错误: Docker Compose未安装${NC}"
+    echo "请安装Docker Compose: https://docs.docker.com/compose/install/"
     exit 1
 fi
+
+echo -e "${GREEN}使用Docker Compose命令: $COMPOSE_CMD${NC}"
 
 # 检查.env文件
 if [ ! -f .env ]; then
@@ -69,12 +78,12 @@ esac
 # 构建镜像
 echo ""
 echo -e "${GREEN}步骤 1: 构建Docker镜像...${NC}"
-docker-compose -f $COMPOSE_FILE build
+$COMPOSE_CMD -f $COMPOSE_FILE build
 
 # 启动服务
 echo ""
 echo -e "${GREEN}步骤 2: 启动服务...${NC}"
-docker-compose -f $COMPOSE_FILE up -d
+$COMPOSE_CMD -f $COMPOSE_FILE up -d
 
 # 等待服务启动
 echo ""
@@ -84,7 +93,7 @@ sleep 5
 # 检查服务状态
 echo ""
 echo -e "${GREEN}步骤 4: 检查服务状态...${NC}"
-docker-compose -f $COMPOSE_FILE ps
+$COMPOSE_CMD -f $COMPOSE_FILE ps
 
 # 显示访问信息
 echo ""
@@ -100,19 +109,19 @@ if [ "$choice" = "1" ]; then
     echo "  - WebSocket: ws://localhost/ws"
     echo ""
     echo "查看日志："
-    echo "  docker-compose logs -f"
+    echo "  $COMPOSE_CMD logs -f"
 else
     echo "访问地址："
     echo "  - 前端: http://localhost:5173"
     echo "  - 后端API: http://localhost:8000"
     echo ""
     echo "查看日志："
-    echo "  docker-compose -f docker-compose.dev.yml logs -f"
+    echo "  $COMPOSE_CMD -f docker-compose.dev.yml logs -f"
 fi
 
 echo ""
 echo "停止服务："
-echo "  docker-compose -f $COMPOSE_FILE down"
+echo "  $COMPOSE_CMD -f $COMPOSE_FILE down"
 echo ""
 echo -e "${YELLOW}提示: 首次运行可能需要初始化数据库${NC}"
 echo -e "${YELLOW}请查看 DOCKER_DEPLOY.md 了解更多信息${NC}"

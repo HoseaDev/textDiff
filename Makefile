@@ -1,5 +1,11 @@
 .PHONY: help build up down restart logs ps clean backup restore
 
+# 检测Docker Compose命令
+COMPOSE := $(shell command -v docker-compose 2> /dev/null)
+ifndef COMPOSE
+	COMPOSE := docker compose
+endif
+
 # 默认目标
 help:
 	@echo "TextDiff Docker 管理命令"
@@ -31,59 +37,59 @@ help:
 
 build:
 	@echo "构建生产环境镜像..."
-	docker-compose build
+	$(COMPOSE) build
 
 up:
 	@echo "启动生产环境..."
-	docker-compose up -d
+	$(COMPOSE) up -d
 	@echo "服务已启动！访问 http://localhost"
 
 down:
 	@echo "停止生产环境..."
-	docker-compose down
+	$(COMPOSE) down
 
 restart:
 	@echo "重启生产环境..."
-	docker-compose restart
+	$(COMPOSE) restart
 
 logs:
-	docker-compose logs -f
+	$(COMPOSE) logs -f
 
 ps:
-	docker-compose ps
+	$(COMPOSE) ps
 
 # ========== 开发环境 ==========
 
 dev-build:
 	@echo "构建开发环境镜像..."
-	docker-compose -f docker-compose.dev.yml build
+	$(COMPOSE) -f docker-compose.dev.yml build
 
 dev-up:
 	@echo "启动开发环境..."
-	docker-compose -f docker-compose.dev.yml up -d
+	$(COMPOSE) -f docker-compose.dev.yml up -d
 	@echo "服务已启动！"
 	@echo "前端: http://localhost:5173"
 	@echo "后端: http://localhost:8000"
 
 dev-down:
 	@echo "停止开发环境..."
-	docker-compose -f docker-compose.dev.yml down
+	$(COMPOSE) -f docker-compose.dev.yml down
 
 dev-logs:
-	docker-compose -f docker-compose.dev.yml logs -f
+	$(COMPOSE) -f docker-compose.dev.yml logs -f
 
 # ========== 维护命令 ==========
 
 clean:
 	@echo "清理停止的容器和未使用的镜像..."
-	docker-compose down
+	$(COMPOSE) down
 	docker system prune -f
 
 clean-all:
 	@echo "⚠️  警告: 这将删除所有数据！"
 	@read -p "确认删除所有数据吗？(yes/no): " confirm; \
 	if [ "$$confirm" = "yes" ]; then \
-		docker-compose down -v; \
+		$(COMPOSE) down -v; \
 		docker system prune -af --volumes; \
 		echo "所有数据已清理！"; \
 	else \
@@ -93,7 +99,7 @@ clean-all:
 backup:
 	@echo "备份数据库..."
 	@mkdir -p backups
-	docker-compose exec -T db mysqldump -u textdiff -ptextdiff123 textdiff > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql
+	$(COMPOSE) exec -T db mysqldump -u textdiff -ptextdiff123 textdiff > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql
 	@echo "备份完成！文件保存在 backups/ 目录"
 
 restore:
@@ -102,18 +108,18 @@ restore:
 		exit 1; \
 	fi
 	@echo "恢复数据库: $(FILE)"
-	docker-compose exec -T db mysql -u textdiff -ptextdiff123 textdiff < $(FILE)
+	$(COMPOSE) exec -T db mysql -u textdiff -ptextdiff123 textdiff < $(FILE)
 	@echo "数据库恢复完成！"
 
 # ========== 快捷命令 ==========
 
 shell-backend:
 	@echo "进入后端容器..."
-	docker-compose exec backend sh
+	$(COMPOSE) exec backend sh
 
 shell-db:
 	@echo "进入数据库容器..."
-	docker-compose exec db mysql -u textdiff -p
+	$(COMPOSE) exec db mysql -u textdiff -p
 
 rebuild:
 	@echo "重新构建并启动..."
@@ -125,8 +131,8 @@ rebuild:
 
 test:
 	@echo "运行测试..."
-	docker-compose exec backend pytest
+	$(COMPOSE) exec backend pytest
 
 test-cov:
 	@echo "运行测试并生成覆盖率报告..."
-	docker-compose exec backend pytest --cov=app
+	$(COMPOSE) exec backend pytest --cov=app

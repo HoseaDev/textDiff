@@ -31,7 +31,7 @@ const showNavbar = computed(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
+  background: var(--color-bg-primary);
 }
 
 .main-content {

@@ -278,23 +278,46 @@ async function handleRegister() {
 </script>
 
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg-primary);
   padding: 20px;
+  position: relative;
+
+  // 背景装饰
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    opacity: 0.1;
+    z-index: 0;
+  }
 }
 
 .register-card {
   width: 100%;
   max-width: 480px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: $border-radius-lg;
+  box-shadow: var(--color-card-shadow);
   padding: 40px;
   animation: slideUp 0.4s ease-out;
+  position: relative;
+  z-index: 1;
+
+  @include mobile {
+    padding: 30px 20px;
+  }
 }
 
 @keyframes slideUp {
@@ -313,15 +336,15 @@ async function handleRegister() {
   margin-bottom: 32px;
 
   h1 {
-    font-size: 28px;
+    font-size: $font-size-xl;
     font-weight: 700;
-    color: #333;
+    color: var(--color-text-primary);
     margin: 0 0 8px 0;
   }
 
   p {
-    color: #666;
-    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-size: $font-size-sm;
     margin: 0;
   }
 }
@@ -333,72 +356,74 @@ async function handleRegister() {
     label {
       display: block;
       margin-bottom: 8px;
-      font-size: 14px;
+      font-size: $font-size-sm;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text-primary);
     }
 
     input {
       width: 100%;
       padding: 12px 16px;
-      border: 1px solid #e1e4e8;
-      border-radius: 6px;
-      font-size: 14px;
-      transition: all 0.2s;
+      border: 1px solid var(--color-input-border);
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      background: var(--color-input-bg);
+      color: var(--color-text-primary);
+      transition: all $transition-fast;
       box-sizing: border-box;
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--color-input-focus-border);
+        box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
       }
 
       &::placeholder {
-        color: #999;
+        color: var(--color-text-tertiary);
       }
     }
 
     .password-strength {
       margin-top: 8px;
       height: 4px;
-      background: #e1e4e8;
+      background: var(--color-bg-tertiary);
       border-radius: 2px;
       overflow: hidden;
 
       .strength-bar {
         height: 100%;
-        transition: all 0.3s;
+        transition: all $transition-base;
 
         &.weak {
-          background: #f44336;
+          background: var(--color-error);
         }
 
         &.medium {
-          background: #ff9800;
+          background: var(--color-warning);
         }
 
         &.strong {
-          background: #4caf50;
+          background: var(--color-success);
         }
       }
     }
 
     .password-hint {
       margin: 4px 0 0 0;
-      font-size: 12px;
-      color: #666;
+      font-size: $font-size-xs;
+      color: var(--color-text-secondary);
     }
 
     .error-hint {
       margin: 4px 0 0 0;
-      font-size: 12px;
-      color: #f44336;
+      font-size: $font-size-xs;
+      color: var(--color-error);
     }
 
     .success-hint {
       margin: 4px 0 0 0;
-      font-size: 12px;
-      color: #4caf50;
+      font-size: $font-size-xs;
+      color: var(--color-success);
     }
 
     .verification-input-group {
@@ -411,22 +436,23 @@ async function handleRegister() {
 
       .btn-send-code {
         padding: 12px 20px;
-        background: #667eea;
+        background: var(--color-primary);
         color: white;
         border: none;
-        border-radius: 6px;
-        font-size: 14px;
+        border-radius: $border-radius-md;
+        font-size: $font-size-sm;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all $transition-fast;
         white-space: nowrap;
 
         &:hover:not(:disabled) {
-          background: #5568d3;
+          background: var(--color-primary-hover);
         }
 
         &:disabled {
-          background: #ccc;
+          background: var(--color-bg-tertiary);
+          color: var(--color-text-disabled);
           cursor: not-allowed;
           opacity: 0.6;
         }
@@ -437,29 +463,30 @@ async function handleRegister() {
   .error-message {
     margin-bottom: 16px;
     padding: 12px;
-    background: #fee;
-    border: 1px solid #fcc;
-    border-radius: 6px;
-    color: #c33;
-    font-size: 14px;
+    background: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
+    border-radius: $border-radius-md;
+    color: var(--color-error);
+    font-size: $font-size-sm;
     text-align: center;
   }
 
   .btn-register {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--color-primary);
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: $border-radius-md;
+    font-size: $font-size-base;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all $transition-base;
 
     &:hover:not(:disabled) {
+      background: var(--color-primary-hover);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 6px 20px var(--color-shadow);
     }
 
     &:disabled {
@@ -474,17 +501,18 @@ async function handleRegister() {
   text-align: center;
 
   p {
-    font-size: 14px;
-    color: #666;
+    font-size: $font-size-sm;
+    color: var(--color-text-secondary);
     margin: 0;
 
     a {
-      color: #667eea;
+      color: var(--color-primary);
       text-decoration: none;
       font-weight: 600;
 
       &:hover {
         text-decoration: underline;
+        color: var(--color-primary-hover);
       }
     }
   }

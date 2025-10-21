@@ -26,11 +26,6 @@
       v-model:content="documentStore.editorContent"
       @show-diff="handleShowDiff"
     />
-
-    <!-- 设置 -->
-    <template #settings>
-      <SaveSettings />
-    </template>
   </AppLayout>
 </template>
 
@@ -45,7 +40,6 @@ import AppLayout from '@/components/AppLayout.vue'
 import DocumentEditor from '@/components/DocumentEditor.vue'
 import VersionList from '@/components/VersionList.vue'
 import DiffViewer from '@/components/DiffViewer.vue'
-import SaveSettings from '@/components/SaveSettings.vue'
 
 const route = useRoute()
 const router = useRouter()

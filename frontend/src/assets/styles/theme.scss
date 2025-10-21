@@ -1,0 +1,207 @@
+/**
+ * 主题变量 - 支持亮色和暗色模式
+ */
+
+:root {
+  // ========== 亮色主题 (默认) ==========
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #f1f3f5;
+  --color-bg-hover: #e9ecef;
+
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-tertiary: #adb5bd;
+  --color-text-disabled: #ced4da;
+
+  --color-border: #dee2e6;
+  --color-border-light: #e9ecef;
+  --color-border-dark: #adb5bd;
+
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-light: rgba(0, 0, 0, 0.05);
+  --color-shadow-dark: rgba(0, 0, 0, 0.2);
+
+  // 品牌色
+  --color-primary: #667eea;
+  --color-primary-hover: #5568d3;
+  --color-primary-light: rgba(102, 126, 234, 0.1);
+
+  --color-secondary: #764ba2;
+  --color-secondary-hover: #6a3d8f;
+
+  // 状态色
+  --color-success: #10b981;
+  --color-success-bg: #d1fae5;
+  --color-success-border: #86efac;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fcd34d;
+  --color-error: #ef4444;
+  --color-error-bg: #fee2e2;
+  --color-error-border: #fca5a5;
+  --color-info: #3b82f6;
+  --color-info-bg: #dbeafe;
+  --color-info-border: #93c5fd;
+
+  // 差异高亮
+  --color-diff-added: #d1fae5;
+  --color-diff-added-text: #065f46;
+  --color-diff-deleted: #fee2e2;
+  --color-diff-deleted-text: #991b1b;
+  --color-diff-modified: #fef3c7;
+  --color-diff-modified-text: #78350f;
+
+  // 编辑器
+  --color-editor-bg: #ffffff;
+  --color-editor-selection: rgba(102, 126, 234, 0.2);
+
+  // 卡片
+  --color-card-bg: #ffffff;
+  --color-card-border: #e9ecef;
+  --color-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  // 导航栏
+  --color-navbar-bg: #ffffff;
+  --color-navbar-border: #e9ecef;
+
+  // 侧边栏
+  --color-sidebar-bg: #f8f9fa;
+  --color-sidebar-border: #e9ecef;
+
+  // 按钮
+  --color-button-secondary-bg: #e9ecef;
+  --color-button-secondary-hover: #dee2e6;
+  --color-button-secondary-text: #495057;
+
+  // 输入框
+  --color-input-bg: #ffffff;
+  --color-input-border: #ced4da;
+  --color-input-focus-border: #667eea;
+  --color-input-focus-shadow: rgba(102, 126, 234, 0.25);
+
+  // 滚动条
+  --color-scrollbar-track: #f1f3f5;
+  --color-scrollbar-thumb: #adb5bd;
+  --color-scrollbar-thumb-hover: #868e96;
+}
+
+[data-theme="dark"] {
+  // ========== 暗色主题 ==========
+  --color-bg-primary: #1a1d23;
+  --color-bg-secondary: #21252b;
+  --color-bg-tertiary: #282c34;
+  --color-bg-hover: #2c313a;
+
+  --color-text-primary: #e4e6eb;
+  --color-text-secondary: #b0b3b8;
+  --color-text-tertiary: #8a8d91;
+  --color-text-disabled: #656871;
+
+  --color-border: #3a3f4a;
+  --color-border-light: #2c313a;
+  --color-border-dark: #4a4f5a;
+
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-dark: rgba(0, 0, 0, 0.4);
+
+  // 品牌色 (暗色模式下稍微调亮)
+  --color-primary: #7c8eea;
+  --color-primary-hover: #8a9aee;
+  --color-primary-light: rgba(124, 142, 234, 0.15);
+
+  --color-secondary: #8659b0;
+  --color-secondary-hover: #9469be;
+
+  // 状态色 (暗色模式下调整)
+  --color-success: #34d399;
+  --color-success-bg: #064e3b;
+  --color-success-border: #059669;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #78350f;
+  --color-warning-border: #f59e0b;
+  --color-error: #f87171;
+  --color-error-bg: #7f1d1d;
+  --color-error-border: #dc2626;
+  --color-info: #60a5fa;
+  --color-info-bg: #1e3a8a;
+  --color-info-border: #3b82f6;
+
+  // 差异高亮 (暗色模式)
+  --color-diff-added: #064e3b;
+  --color-diff-added-text: #6ee7b7;
+  --color-diff-deleted: #7f1d1d;
+  --color-diff-deleted-text: #fca5a5;
+  --color-diff-modified: #78350f;
+  --color-diff-modified-text: #fde047;
+
+  // 编辑器
+  --color-editor-bg: #1e2127;
+  --color-editor-selection: rgba(124, 142, 234, 0.3);
+
+  // 卡片
+  --color-card-bg: #21252b;
+  --color-card-border: #3a3f4a;
+  --color-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  // 导航栏
+  --color-navbar-bg: #21252b;
+  --color-navbar-border: #3a3f4a;
+
+  // 侧边栏
+  --color-sidebar-bg: #1a1d23;
+  --color-sidebar-border: #3a3f4a;
+
+  // 按钮
+  --color-button-secondary-bg: #3a3f4a;
+  --color-button-secondary-hover: #4a4f5a;
+  --color-button-secondary-text: #e4e6eb;
+
+  // 输入框
+  --color-input-bg: #282c34;
+  --color-input-border: #4a4f5a;
+  --color-input-focus-border: #7c8eea;
+  --color-input-focus-shadow: rgba(124, 142, 234, 0.3);
+
+  // 滚动条
+  --color-scrollbar-track: #282c34;
+  --color-scrollbar-thumb: #4a4f5a;
+  --color-scrollbar-thumb-hover: #5a5f6a;
+}
+
+// ========== 全局样式应用 ==========
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+// ========== 滚动条样式 ==========
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 6px;
+  border: 3px solid var(--color-scrollbar-track);
+
+  &:hover {
+    background: var(--color-scrollbar-thumb-hover);
+  }
+}
+
+// ========== 选择文本颜色 ==========
+::selection {
+  background-color: var(--color-primary-light);
+  color: var(--color-text-primary);
+}

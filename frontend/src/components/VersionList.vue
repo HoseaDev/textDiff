@@ -36,7 +36,7 @@
 
       <div v-if="loading" class="loading-container">
         <span class="loading"></span>
-        加载中...
+        加载中222...
       </div>
 
       <div v-if="!loading && versions.length === 0" class="empty-state">
@@ -97,45 +97,69 @@ function formatDate(dateString: string) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: var(--color-sidebar-bg);
 }
 
 .version-filter {
-  padding: $spacing-sm;
-  border-bottom: 1px solid $color-border;
+  padding: $spacing-md;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
 }
 
 .filter-select {
   width: 100%;
-  padding: $spacing-xs $spacing-sm;
-  border: 1px solid $color-border;
-  border-radius: $border-radius-sm;
+  padding: 8px 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: $border-radius-md;
   font-size: $font-size-sm;
-  background-color: $color-bg-primary;
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: $color-primary;
+    border-color: var(--color-input-focus-border);
+    box-shadow: 0 0 0 2px var(--color-input-focus-shadow);
   }
 }
 
 .version-items {
   flex: 1;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--color-scrollbar-thumb-hover);
+    }
+  }
 }
 
 .version-item {
   padding: $spacing-md;
-  border-bottom: 1px solid $color-border;
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
-  transition: background-color $transition-fast;
+  transition: all $transition-fast;
+  background: var(--color-sidebar-bg);
 
   &:hover {
-    background-color: $color-bg-tertiary;
+    background: var(--color-bg-hover);
   }
 
   &.active {
-    background-color: rgba($color-primary, 0.1);
-    border-left: 3px solid $color-primary;
+    background: var(--color-primary-light);
+    border-left: 3px solid var(--color-primary);
+    padding-left: calc(#{$spacing-md} - 3px);
   }
 }
 
@@ -148,22 +172,24 @@ function formatDate(dateString: string) {
 
 .version-number {
   font-weight: 600;
-  color: $color-text-primary;
+  font-size: $font-size-base;
+  color: var(--color-text-primary);
 }
 
 .version-type {
-  padding: 2px 6px;
+  padding: 3px 8px;
   font-size: $font-size-xs;
   border-radius: $border-radius-sm;
+  font-weight: 500;
 
   &.type-manual {
-    background-color: rgba($color-primary, 0.1);
-    color: $color-primary;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
   }
 
   &.type-auto {
-    background-color: rgba($color-text-secondary, 0.1);
-    color: $color-text-secondary;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
   }
 }
 
@@ -171,28 +197,30 @@ function formatDate(dateString: string) {
   display: flex;
   justify-content: space-between;
   font-size: $font-size-xs;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
   margin-bottom: $spacing-xs;
 }
 
 .version-message {
   font-size: $font-size-sm;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
   margin-bottom: $spacing-xs;
+  line-height: 1.4;
   @include text-truncate-lines(2);
 }
 
 .version-stats {
   font-size: $font-size-xs;
-  color: $color-text-disabled;
+  color: var(--color-text-tertiary);
 }
 
 .loading-container,
 .empty-state {
-  padding: $spacing-lg;
+  padding: $spacing-xl;
   text-align: center;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;

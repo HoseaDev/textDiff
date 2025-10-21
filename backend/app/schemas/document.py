@@ -14,8 +14,9 @@ class DocumentBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
 
 
-class DocumentCreate(DocumentBase):
+class DocumentCreate(BaseModel):
     """创建文档请求模式"""
+    title: str = Field(..., min_length=1, max_length=255, description="文档标题")
     initial_content: Optional[str] = ""
     author: Optional[str] = "anonymous"
 

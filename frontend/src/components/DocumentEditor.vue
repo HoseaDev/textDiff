@@ -116,6 +116,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: var(--color-bg-primary);
 }
 
 .editor-toolbar {
@@ -123,8 +124,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: $spacing-md;
-  background-color: $color-bg-secondary;
-  border-bottom: 1px solid $color-border;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
 
   @include mobile {
     flex-direction: column;
@@ -146,31 +147,41 @@ onMounted(() => {
 
 .word-count {
   font-size: $font-size-sm;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
+  padding: 4px 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
 }
 
 .editor-textarea {
   flex: 1;
-  padding: $spacing-md;
+  padding: $spacing-lg;
   font-family: $font-family-mono;
   font-size: $font-size-base;
-  line-height: 1.6;
+  line-height: 1.8;
   border: none;
   outline: none;
   resize: none;
+  background: var(--color-editor-bg);
+  color: var(--color-text-primary);
 
   @include mobile {
-    padding: $spacing-sm;
+    padding: $spacing-md;
     font-size: $font-size-sm;
   }
 
   &::placeholder {
-    color: $color-text-disabled;
+    color: var(--color-text-tertiary);
+  }
+
+  &::selection {
+    background: var(--color-editor-selection);
   }
 
   &:disabled {
-    background-color: $color-bg-tertiary;
+    background: var(--color-bg-tertiary);
     cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 </style>

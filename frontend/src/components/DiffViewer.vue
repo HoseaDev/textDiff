@@ -166,21 +166,21 @@ watch([diffMode, ignoreCase, ignoreWhitespace], () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #0b0f14;
-  color: #e5e7eb;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 // 头部
 .diff-header {
-  padding: $spacing-md;
-  background: #121821;
-  border-bottom: 1px solid #222b36;
+  padding: $spacing-md $spacing-lg;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
 
   h3 {
-    font-size: $font-size-lg;
+    font-size: $font-size-xl;
     font-weight: 600;
-    margin: 0 0 $spacing-sm 0;
-    color: #cbd5e1;
+    margin: 0 0 $spacing-md 0;
+    color: var(--color-text-primary);
   }
 }
 
@@ -196,89 +196,106 @@ watch([diffMode, ignoreCase, ignoreWhitespace], () => {
 }
 
 .control-label {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: $font-size-sm;
+  font-weight: 500;
 }
 
 .diff-select {
-  background: #0e1622;
-  color: #e5e7eb;
-  border: 1px solid #222b36;
-  border-radius: 10px;
-  padding: 6px 10px;
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-input-border);
+  border-radius: $border-radius-md;
+  padding: 8px 12px;
   font-size: $font-size-sm;
+  cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #2b3646;
+    border-color: var(--color-input-focus-border);
+    box-shadow: 0 0 0 2px var(--color-input-focus-shadow);
   }
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-size: $font-size-sm;
-  color: #e5e7eb;
+  color: var(--color-text-primary);
   cursor: pointer;
   user-select: none;
+  padding: 6px 12px;
+  border-radius: $border-radius-md;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+  }
 
   input[type="checkbox"] {
     cursor: pointer;
+    width: 16px;
+    height: 16px;
   }
 }
 
 .btn-close {
-  background: #0e1622;
-  color: #e5e7eb;
-  border: 1px solid #222b36;
-  padding: 6px 12px;
-  border-radius: 10px;
+  background: var(--color-button-secondary-bg);
+  color: var(--color-button-secondary-text);
+  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border-radius: $border-radius-md;
   cursor: pointer;
   font-size: $font-size-sm;
+  font-weight: 500;
   margin-left: auto;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: #2b3646;
-    background: #101a28;
+    background: var(--color-button-secondary-hover);
+    transform: translateY(-1px);
   }
 }
 
 // 统计信息
 .diff-stats {
   display: flex;
-  gap: 10px;
-  padding: $spacing-sm $spacing-md;
-  background: #121821;
-  border-bottom: 1px solid #222b36;
+  gap: 12px;
+  padding: $spacing-md $spacing-lg;
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
 
   @include mobile {
-    gap: $spacing-xs;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
   }
 }
 
 .stat-pill {
-  display: inline-block;
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid #222b36;
-  background: #0e1622;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   font-size: $font-size-sm;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
 
   strong {
-    color: #e5e7eb;
-    margin-left: 4px;
+    color: var(--color-text-primary);
+    font-weight: 600;
   }
 }
 
 .version-info {
-  padding: $spacing-xs $spacing-md;
-  background: #0b1320;
-  border-bottom: 1px solid #222b36;
+  padding: $spacing-sm $spacing-lg;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
   font-size: $font-size-sm;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .version-label {
@@ -289,66 +306,71 @@ watch([diffMode, ignoreCase, ignoreWhitespace], () => {
 .diff-content {
   flex: 1;
   overflow: auto;
-  background: #0b1320;
+  background: var(--color-editor-bg);
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 5px;
+
+    &:hover {
+      background: var(--color-scrollbar-thumb-hover);
+    }
+  }
 }
 
 .diff-unified {
-  padding: $spacing-md;
+  padding: $spacing-lg;
   min-height: 200px;
   white-space: pre-wrap;
   word-wrap: break-word;
   font-family: $font-family-mono;
-  font-size: $font-size-sm;
+  font-size: $font-size-base;
   line-height: 1.8;
+  color: var(--color-text-primary);
 
   @include mobile {
-    padding: $spacing-sm;
-    font-size: $font-size-xs;
+    padding: $spacing-md;
+    font-size: $font-size-sm;
   }
 
   .empty {
-    color: #6b7280;
+    color: var(--color-text-tertiary);
     text-align: center;
-    padding: $spacing-xl;
+    padding: $spacing-2xl;
+    font-size: $font-size-lg;
   }
 
   // 新增内容：绿色背景
   :deep(.diff-added) {
-    background: rgba(6, 94, 46, 0.5);
-    color: #78f3b1;
-    border-radius: 4px;
-    padding: 1px 2px;
+    background: var(--color-diff-added);
+    color: var(--color-diff-added-text);
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-weight: 500;
   }
 
   // 删除内容：红色背景 + 删除线
   :deep(.diff-deleted) {
-    background: rgba(128, 0, 0, 0.5);
-    color: #ff9aa2;
+    background: var(--color-diff-deleted);
+    color: var(--color-diff-deleted-text);
     text-decoration: line-through;
-    border-radius: 4px;
-    padding: 1px 2px;
+    border-radius: 3px;
+    padding: 2px 4px;
   }
 
-  // 未变化内容：浅色
+  // 未变化内容
   :deep(.diff-unchanged) {
-    color: #cbd5e1;
-  }
-}
-
-// 自定义滚动条
-.diff-content {
-  @include custom-scrollbar;
-
-  &::-webkit-scrollbar-track {
-    background: #0b1320;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #222b36;
-
-    &:hover {
-      background: #2b3646;
-    }
+    color: var(--color-text-primary);
+    opacity: 0.7;
   }
 }
 </style>

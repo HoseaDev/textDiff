@@ -34,14 +34,10 @@
       </div>
     </div>
 
-    <!-- 加载状态 -->
-    <div v-if="isLoading" class="loading">
-      <div class="spinner"></div>
-      <p>加载中...</p>
-    </div>
+ 
 
     <!-- 文档列表 -->
-    <div v-else-if="documents.length > 0" class="document-grid">
+    <div  class="document-grid">
       <div
         v-for="doc in documents"
         :key="doc.id"
@@ -70,7 +66,7 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else class="empty-state">
+    <div  class="empty-state">
       <div class="empty-icon">📄</div>
       <h3>还没有文档</h3>
       <p>点击上方"新建文档"按钮创建第一个文档</p>
@@ -113,15 +109,52 @@
       class="context-menu-overlay"
       @click="closeContextMenu"
     ></div>
+
+    <!-- 新建文档对话框 -->
+    <div v-if="showCreateDialog" class="dialog-overlay" @click="closeCreateDialog">
+      <div class="dialog-card" @click.stop>
+        <div class="dialog-header">
+          <h3>新建文档</h3>
+          <button @click="closeCreateDialog" class="btn-close">✕</button>
+        </div>
+        <div class="dialog-body">
+          <div class="form-group">
+            <label for="new-doc-title">文档标题 *</label>
+            <input
+              id="new-doc-title"
+              ref="titleInputRef"
+              v-model="newDocTitle"
+              type="text"
+              placeholder="请输入文档标题"
+              maxlength="255"
+              @keyup.enter="confirmCreateDocument"
+              @keyup.esc="closeCreateDialog"
+            />
+            <p class="input-hint">{{ newDocTitle.length }}/255</p>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button @click="closeCreateDialog" class="btn-secondary">取消</button>
+          <button
+            @click="confirmCreateDocument"
+            class="btn-primary"
+            :disabled="!newDocTitle.trim()"
+          >
+            创建
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { documentApi } from '@/api/client'
 import type { Document } from '@/types'
 import { formatDate as formatDateUtil } from '@/utils/date'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 
@@ -133,6 +166,14 @@ const sortBy = ref('updated_at')
 const currentPage = ref(1)
 const pageSize = 20
 const totalCount = ref(0)
+
+// 加载动画类型
+const loadingAnimationType = ref<'spinner' | 'dots' | 'pulse' | 'gradient'>('spinner')
+
+// 新建文档对话框
+const showCreateDialog = ref(false)
+const newDocTitle = ref('')
+const titleInputRef = ref<HTMLInputElement>()
 
 // 右键菜单
 const contextMenu = ref({
@@ -176,13 +217,33 @@ function onSearch() {
   }, 300)
 }
 
-// 创建新文档
-async function createNewDocument() {
+// 打开新建文档对话框
+function createNewDocument() {
+  newDocTitle.value = ''
+  showCreateDialog.value = true
+  nextTick(() => {
+    titleInputRef.value?.focus()
+  })
+}
+
+// 关闭对话框
+function closeCreateDialog() {
+  showCreateDialog.value = false
+  newDocTitle.value = ''
+}
+
+// 确认创建文档
+async function confirmCreateDocument() {
+  if (!newDocTitle.value.trim()) {
+    return
+  }
+
   try {
     const newDoc = await documentApi.create({
-      title: '未命名文档',
+      title: newDocTitle.value.trim(),
       initial_content: ''
     })
+    closeCreateDialog()
     router.push(`/document/${newDoc.id}`)
   } catch (error: any) {
     console.error('Failed to create document:', error)
@@ -257,6 +318,12 @@ watch(currentPage, () => {
 
 // 组件挂载时加载文档
 onMounted(() => {
+  // 从 localStorage 读取加载动画类型
+  const saved = localStorage.getItem('loadingAnimationType')
+  if (saved && ['spinner', 'dots', 'pulse', 'gradient'].includes(saved)) {
+    loadingAnimationType.value = saved as any
+  }
+
   loadDocuments()
 })
 </script>
@@ -266,6 +333,8 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background: var(--color-bg-primary);
+  min-height: calc(100vh - 60px);
 }
 
 .toolbar {
@@ -283,11 +352,11 @@ onMounted(() => {
       font-size: 28px;
       font-weight: 700;
       margin: 0;
-      color: #333;
+      color: var(--color-text-primary);
     }
 
     .document-count {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
   }
@@ -329,15 +398,17 @@ onMounted(() => {
     input {
       width: 100%;
       padding: 10px 16px;
-      border: 1px solid #e1e4e8;
+      border: 1px solid var(--color-input-border);
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
+      background: var(--color-input-bg);
+      color: var(--color-text-primary);
 
       &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--color-input-focus-border);
+        box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
       }
     }
   }
@@ -349,47 +420,32 @@ onMounted(() => {
 
     label {
       font-size: 14px;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     select {
       padding: 8px 12px;
-      border: 1px solid #e1e4e8;
+      border: 1px solid var(--color-input-border);
       border-radius: 6px;
       font-size: 14px;
       cursor: pointer;
+      background: var(--color-input-bg);
+      color: var(--color-text-primary);
 
       &:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--color-input-focus-border);
       }
     }
   }
 }
 
 .loading {
-  text-align: center;
-  padding: 60px 20px;
-
-  .spinner {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 16px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  p {
-    color: #666;
-    font-size: 14px;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
+  min-height: 400px;
 }
 
 .document-grid {
@@ -400,16 +456,16 @@ onMounted(() => {
 }
 
 .document-card {
-  background: white;
-  border: 1px solid #e1e4e8;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
   border-radius: 8px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: var(--color-card-shadow);
     transform: translateY(-2px);
   }
 
@@ -424,7 +480,7 @@ onMounted(() => {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #333;
+      color: var(--color-text-primary);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -435,13 +491,13 @@ onMounted(() => {
         padding: 4px 8px;
         background: none;
         border: none;
-        color: #666;
+        color: var(--color-text-secondary);
         font-size: 20px;
         cursor: pointer;
         border-radius: 4px;
 
         &:hover {
-          background: #f5f5f5;
+          background: var(--color-bg-hover);
         }
       }
     }
@@ -458,12 +514,12 @@ onMounted(() => {
         font-size: 13px;
 
         .label {
-          color: #666;
+          color: var(--color-text-secondary);
           min-width: 48px;
         }
 
         .value {
-          color: #333;
+          color: var(--color-text-primary);
         }
       }
     }
@@ -483,12 +539,12 @@ onMounted(() => {
   h3 {
     font-size: 20px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text-primary);
     margin: 0 0 8px 0;
   }
 
   p {
-    color: #666;
+    color: var(--color-text-secondary);
     font-size: 14px;
     margin: 0 0 24px 0;
   }
@@ -518,15 +574,18 @@ onMounted(() => {
 
   .btn-page {
     padding: 8px 16px;
-    background: white;
-    border: 1px solid #e1e4e8;
+    background: var(--color-button-secondary-bg);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
+    color: var(--color-text-primary);
+    transition: all 0.2s;
 
     &:hover:not(:disabled) {
-      border-color: #667eea;
-      color: #667eea;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-light);
     }
 
     &:disabled {
@@ -537,16 +596,16 @@ onMounted(() => {
 
   .page-info {
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-secondary);
   }
 }
 
 .context-menu {
   position: fixed;
-  background: white;
-  border: 1px solid #e1e4e8;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--color-card-shadow);
   padding: 4px 0;
   min-width: 120px;
   z-index: 1000;
@@ -555,16 +614,17 @@ onMounted(() => {
     padding: 8px 16px;
     font-size: 14px;
     cursor: pointer;
+    color: var(--color-text-primary);
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--color-bg-hover);
     }
 
     &.danger {
-      color: #f44336;
+      color: var(--color-error);
 
       &:hover {
-        background: #fee;
+        background: var(--color-error-bg);
       }
     }
   }
@@ -577,5 +637,168 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   z-index: 999;
+}
+
+// 新建文档对话框
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog-card {
+  background: var(--color-card-bg);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px var(--color-shadow);
+  width: 90%;
+  max-width: 500px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .btn-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+.dialog-body {
+  padding: 24px;
+
+  .form-group {
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--color-input-border);
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--color-input-bg);
+      color: var(--color-text-primary);
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-input-focus-border);
+        box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
+      }
+
+      &::placeholder {
+        color: var(--color-text-tertiary);
+      }
+    }
+
+    .input-hint {
+      margin: 6px 0 0 0;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      text-align: right;
+    }
+  }
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+
+  button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+
+    &.btn-secondary {
+      background: var(--color-button-secondary-bg);
+      color: var(--color-button-secondary-text);
+
+      &:hover {
+        background: var(--color-button-secondary-hover);
+      }
+    }
+
+    &.btn-primary {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+      color: white;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px var(--color-shadow);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 </style>

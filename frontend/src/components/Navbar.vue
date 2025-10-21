@@ -17,6 +17,13 @@
         </router-link>
       </div>
 
+      <!-- Theme Toggle -->
+      <div class="navbar-theme">
+        <button @click="handleToggleTheme" class="theme-toggle" :title="isDark ? '切换到亮色模式' : '切换到暗色模式'">
+          <span class="theme-icon">{{ isDark ? '☀️' : '🌙' }}</span>
+        </button>
+      </div>
+
       <!-- User Menu -->
       <div class="navbar-user">
         <div class="user-info" @click="toggleUserMenu">
@@ -69,9 +76,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
 // State
 const showUserMenu = ref(false)
@@ -82,6 +91,7 @@ const userInitial = computed(() => {
   if (!currentUser.value?.username) return '?'
   return currentUser.value.username.charAt(0).toUpperCase()
 })
+const isDark = computed(() => themeStore.mode === 'dark')
 
 // Methods
 function toggleUserMenu() {
@@ -90,6 +100,10 @@ function toggleUserMenu() {
 
 function closeUserMenu() {
   showUserMenu.value = false
+}
+
+function handleToggleTheme() {
+  themeStore.toggleTheme()
 }
 
 async function handleLogout() {
@@ -103,10 +117,10 @@ async function handleLogout() {
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background: white;
-  border-bottom: 1px solid #e1e4e8;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  background: var(--color-navbar-bg);
+  border-bottom: 1px solid var(--color-navbar-border);
+  box-shadow: 0 2px 4px var(--color-shadow-light);
 }
 
 .navbar-container {
@@ -170,13 +184,45 @@ async function handleLogout() {
     }
 
     &:hover {
-      background: #f5f5f5;
-      color: #333;
+      background: var(--color-bg-hover);
+      color: var(--color-text-primary);
     }
 
     &.active {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      color: #667eea;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+  }
+}
+
+.navbar-theme {
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    background: var(--color-bg-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    .theme-icon {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background: var(--color-bg-hover);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
   }
 }
@@ -194,14 +240,14 @@ async function handleLogout() {
     transition: background 0.2s;
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--color-bg-hover);
     }
 
     .user-avatar {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
       color: white;
       display: flex;
       align-items: center;
@@ -213,7 +259,7 @@ async function handleLogout() {
     .user-name {
       font-size: 14px;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text-primary);
       max-width: 120px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -222,7 +268,7 @@ async function handleLogout() {
 
     .dropdown-icon {
       font-size: 10px;
-      color: #666;
+      color: var(--color-text-secondary);
       transition: transform 0.2s;
     }
   }
@@ -232,16 +278,17 @@ async function handleLogout() {
     top: calc(100% + 8px);
     right: 0;
     width: 280px;
-    background: white;
-    border: 1px solid #e1e4e8;
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--color-card-shadow);
     overflow: hidden;
     animation: slideDown 0.2s ease-out;
+    z-index: 1001;
 
     .dropdown-header {
       padding: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
       display: flex;
       gap: 12px;
       align-items: center;
@@ -283,7 +330,7 @@ async function handleLogout() {
 
     .dropdown-divider {
       height: 1px;
-      background: #e1e4e8;
+      background: var(--color-border);
       margin: 0;
     }
 
@@ -296,7 +343,7 @@ async function handleLogout() {
       align-items: center;
       gap: 12px;
       padding: 10px 16px;
-      color: #333;
+      color: var(--color-text-primary);
       font-size: 14px;
       text-decoration: none;
       cursor: pointer;
@@ -309,14 +356,14 @@ async function handleLogout() {
       }
 
       &:hover {
-        background: #f5f5f5;
+        background: var(--color-bg-hover);
       }
 
       &.danger {
-        color: #f44336;
+        color: var(--color-error);
 
         &:hover {
-          background: #fee;
+          background: var(--color-error-bg);
         }
       }
     }
@@ -329,7 +376,8 @@ async function handleLogout() {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 99;
+  z-index: 1000;
+  background: transparent;
 }
 
 @keyframes slideDown {

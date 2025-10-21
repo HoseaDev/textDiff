@@ -1,64 +1,46 @@
 <template>
   <div class="app-layout" :class="{ 'mobile-menu-open': isMobileMenuOpen }">
-    <!-- 顶部导航栏 -->
-    <header class="app-header">
-      <div class="header-content">
-        <div class="header-left">
-          <!-- 移动端菜单按钮 -->
-          <button
-            class="mobile-menu-btn btn btn-secondary"
-            @click="toggleMobileMenu"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M3 12h18M3 6h18M3 18h18" />
-            </svg>
-          </button>
+    <!-- 文档信息栏 -->
+    <div class="document-info-bar">
+      <div class="info-left">
+        <!-- 移动端菜单按钮 -->
+        <button class="mobile-menu-btn" @click="toggleMobileMenu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18" />
+          </svg>
+        </button>
 
-          <h1 class="app-title">TextDiff</h1>
-        </div>
-
-        <div class="header-right">
-          <!-- 保存状态指示器 -->
-          <div class="save-indicator">
-            <span v-if="documentStore.saveState.isSaving" class="saving">
-              <span class="loading"></span>
-              保存中...
-            </span>
-            <span v-else-if="!documentStore.hasUnsavedChanges" class="saved">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" />
-              </svg>
-              已保存
-            </span>
-            <span v-else class="unsaved">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="12" r="8" />
-              </svg>
-              未保存
-            </span>
-            <span v-if="documentStore.saveState.lastSaved" class="last-saved">
-              {{ formatTime(documentStore.saveState.lastSaved) }}
-            </span>
-          </div>
-
-          <!-- 设置按钮 -->
-          <button class="btn btn-secondary btn-sm" @click="showSettings = true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <span class="hide-mobile">设置</span>
-          </button>
+        <div class="document-title-section">
+          <span class="document-icon">📄</span>
+          <h1 class="document-title">{{ documentStore.currentDocument?.title || '加载中321...' }}</h1>
         </div>
       </div>
-    </header>
+
+      <div class="info-right">
+        <!-- 保存状态指示器 -->
+        <div class="save-indicator">
+          <span v-if="documentStore.saveState.isSaving" class="saving">
+            <span class="loading-spinner"></span>
+            保存中...
+          </span>
+          <span v-else-if="!documentStore.hasUnsavedChanges" class="saved">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 6L9 17l-5-5" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            已保存
+          </span>
+          <span v-else class="unsaved">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="8" />
+            </svg>
+            未保存
+          </span>
+          <span v-if="documentStore.saveState.lastSaved" class="last-saved">
+            {{ formatTime(documentStore.saveState.lastSaved) }}
+          </span>
+        </div>
+      </div>
+    </div>
 
     <!-- 主内容区 -->
     <div class="app-main">
@@ -86,19 +68,6 @@
         <slot></slot>
       </main>
     </div>
-
-    <!-- 设置模态框 -->
-    <div v-if="showSettings" class="modal-overlay" @click="showSettings = false">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h2>保存设置</h2>
-          <button class="btn-close" @click="showSettings = false">×</button>
-        </div>
-        <div class="modal-body">
-          <slot name="settings"></slot>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -108,7 +77,6 @@ import { useDocumentStore } from '@/stores/document'
 
 const documentStore = useDocumentStore()
 const isMobileMenuOpen = ref(false)
-const showSettings = ref(false)
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -136,63 +104,92 @@ function formatTime(date: Date) {
 .app-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 60px); // 减去Navbar高度
   overflow: hidden;
+  background: var(--color-bg-primary);
 }
 
-// ========== 顶部导航栏 ==========
-.app-header {
-  height: 60px;
-  background-color: $color-bg-primary;
-  border-bottom: 1px solid $color-border;
-  z-index: 100;
-
-  @include mobile {
-    height: 50px;
-  }
-}
-
-.header-content {
+// ========== 文档信息栏 ==========
+.document-info-bar {
+  height: 56px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100%;
-  padding: 0 $spacing-md;
+  padding: 0 $spacing-lg;
+  flex-shrink: 0;
 
   @include mobile {
-    padding: 0 $spacing-sm;
+    height: 50px;
+    padding: 0 $spacing-md;
   }
 }
 
-.header-left {
+.info-left {
   display: flex;
   align-items: center;
   gap: $spacing-md;
+  flex: 1;
+  min-width: 0; // 允许子元素收缩
 }
 
 .mobile-menu-btn {
   display: none;
-  padding: $spacing-xs;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
 
   @include tablet {
     display: flex;
   }
 }
 
-.app-title {
-  font-size: $font-size-xl;
-  font-weight: 700;
-  color: $color-primary;
+.document-title-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.document-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.document-title {
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   @include mobile {
-    font-size: $font-size-lg;
+    font-size: $font-size-base;
   }
 }
 
-.header-right {
+.info-right {
   display: flex;
   align-items: center;
   gap: $spacing-md;
+  flex-shrink: 0;
 
   @include mobile {
     gap: $spacing-sm;
@@ -203,9 +200,9 @@ function formatTime(date: Date) {
 .save-indicator {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-xs $spacing-sm;
-  background-color: $color-bg-secondary;
+  gap: $spacing-xs;
+  padding: 6px 12px;
+  background: var(--color-bg-tertiary);
   border-radius: $border-radius-md;
   font-size: $font-size-sm;
 
@@ -216,24 +213,40 @@ function formatTime(date: Date) {
   }
 
   .saving {
-    color: $color-info;
+    color: var(--color-info);
   }
 
   .saved {
-    color: $color-success;
+    color: var(--color-success);
   }
 
   .unsaved {
-    color: $color-warning;
+    color: var(--color-warning);
   }
 
   .last-saved {
-    color: $color-text-secondary;
+    color: var(--color-text-tertiary);
     font-size: $font-size-xs;
 
     @include mobile {
       display: none;
     }
+  }
+
+  .loading-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-top-color: var(--color-info);
+    border-right-color: var(--color-info);
+    border-radius: 50%;
+    animation: spin-smooth 0.8s linear infinite;
+  }
+}
+
+@keyframes spin-smooth {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -246,22 +259,22 @@ function formatTime(date: Date) {
 
 // ========== 侧边栏 ==========
 .app-sidebar {
-  width: 300px;
-  background-color: $color-bg-secondary;
-  border-right: 1px solid $color-border;
+  width: 320px;
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-sidebar-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 
   @include tablet {
     position: fixed;
-    top: 0;
+    top: 60px; // Navbar高度
     left: 0;
     bottom: 0;
-    z-index: 200;
+    z-index: 900;
     transform: translateX(-100%);
     transition: transform $transition-base;
-    box-shadow: $shadow-lg;
+    box-shadow: 4px 0 12px var(--color-shadow);
 
     &.is-open {
       transform: translateX(0);
@@ -270,7 +283,7 @@ function formatTime(date: Date) {
 
   @include mobile {
     width: 80vw;
-    max-width: 300px;
+    max-width: 320px;
   }
 }
 
@@ -278,12 +291,15 @@ function formatTime(date: Date) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-md;
-  border-bottom: 1px solid $color-border;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
 
   h2 {
     font-size: $font-size-lg;
     font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
   }
 }
 
@@ -291,11 +307,18 @@ function formatTime(date: Date) {
   display: none;
   width: 32px;
   height: 32px;
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 28px;
+  border-radius: 6px;
+  font-size: 24px;
   cursor: pointer;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
 
   @include tablet {
     display: flex;
@@ -307,85 +330,69 @@ function formatTime(date: Date) {
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: $spacing-sm;
+  padding: $spacing-md;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--color-scrollbar-thumb-hover);
+    }
+  }
 }
 
 // ========== 主编辑区 ==========
 .app-content {
   flex: 1;
   overflow: auto;
-  background-color: $color-bg-primary;
-}
+  background: var(--color-bg-primary);
 
-// ========== 模态框 ==========
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 300;
-  padding: $spacing-md;
-}
-
-.modal-content {
-  background-color: $color-bg-primary;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-lg;
-  max-width: 600px;
-  width: 100%;
-  max-height: 90vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-
-  @include mobile {
-    max-width: 100%;
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
   }
-}
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: $spacing-md;
-  border-bottom: 1px solid $color-border;
-
-  h2 {
-    font-size: $font-size-lg;
-    font-weight: 600;
+  &::-webkit-scrollbar-track {
+    background: var(--color-scrollbar-track);
   }
-}
 
-.btn-close {
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: $color-text-secondary;
-  transition: color $transition-fast;
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 5px;
 
-  &:hover {
-    color: $color-text-primary;
+    &:hover {
+      background: var(--color-scrollbar-thumb-hover);
+    }
   }
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: $spacing-md;
 }
 
 // 移动端菜单打开时，阻止背景滚动
 .mobile-menu-open {
   @include tablet {
     overflow: hidden;
+  }
+}
+
+// 遮罩层(移动端侧边栏打开时)
+@include tablet {
+  .mobile-menu-open::after {
+    content: '';
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 899;
   }
 }
 </style>

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>个人版网页文本对比器（本地版）</title>
+  <style>
+    :root {
+      --bg: #0b0f14; --card: #121821; --muted: #6b7280; --text: #e5e7eb; --accent: #60a5fa;
+      --add-bg: #063; --add: #78f3b1; --del-bg: #400; --del: #ff9aa2; --border: #222b36;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    .wrap { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    textarea { width: 100%; min-height: 220px; resize: vertical; background: #0b1320; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    label { color: var(--muted); font-size: 12px; display: inline-block; margin-bottom: 6px; }
+    .btn { appearance: none; border: 1px solid var(--border); background: #0e1622; color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+    .btn:hover { border-color: #2b3646; background: #101a28; }
+    .btn.primary { border-color: #1e3a8a; background: #0b1430; color: #bfdbfe; }
+    .btn.ghost { background: transparent; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    select, input[type="text"] { background: #0e1622; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; }
+    .section-title { margin: 18px 0 10px; font-weight: 600; color: #cbd5e1; }
+    .diff { white-space: pre-wrap; background: #0b1320; border: 1px solid var(--border); border-radius: 8px; padding: 12px; min-height: 160px; }
+    .added { background: rgba(6, 94, 46, .5); color: var(--add); border-radius: 4px; padding: 1px 0; }
+    .removed { background: rgba(128, 0, 0, .5); color: var(--del); text-decoration: line-through; border-radius: 4px; padding: 1px 0; }
+    .unchanged { color: #cbd5e1; }
+    .muted { color: var(--muted); }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .help { font-size: 12px; color: var(--muted); }
+    .footer { margin-top: 16px; text-align: right; color: var(--muted); font-size: 12px; }
+    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; border:1px solid var(--border); background:#0e1622; }
+    .summary { display:flex; gap:10px; flex-wrap:wrap; }
+    .hr { height:1px; background: var(--border); margin: 10px 0; border:0; }
+  </style>
+  <!-- jsdiff CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>个人版网页文本对比器（本地保存 / 离线可用）</h1>
+    <p class="help">📝 用途：对比任意两个版本，看看“改动了哪里”。所有版本保存在浏览器本地 <span class="pill">localStorage</span>，无服务器。</p>
+
+    <div class="card" id="liveCompare">
+      <div class="row">
+        <div>
+          <label for="left">版本 A（旧 / 基线）</label>
+          <textarea id="left" placeholder="把第一次版本粘贴到这里，或从下方版本库选择"></textarea>
+        </div>
+        <div>
+          <label for="right">版本 B（新 / 当前）</label>
+          <textarea id="right" placeholder="把第10次版本粘贴到这里，或从下方版本库选择"></textarea>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:10px">
+        <button class="btn primary" id="btnCompare">对比</button>
+        <button class="btn" id="btnSwap" title="左右互换">左右互换</button>
+        <span class="muted">粒度：</span>
+        <select id="granularity">
+          <option value="words" selected>词级</option>
+          <option value="chars">字符级</option>
+          <option value="lines">行级</option>
+        </select>
+        <label><input type="checkbox" id="ignoreCase" /> 忽略大小写</label>
+        <label><input type="checkbox" id="ignoreWhitespace" /> 忽略空白</label>
+      </div>
+
+      <div class="section-title">对比结果</div>
+      <div class="summary" id="summary">
+        <span class="pill">新增：<b id="addedCount">0</b></span>
+        <span class="pill">删除：<b id="removedCount">0</b></span>
+        <span class="pill">变更块：<b id="blockCount">0</b></span>
+      </div>
+      <div class="diff" id="diff"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px" id="versionLib">
+      <div class="section-title">版本库（保存在本地浏览器）</div>
+      <div class="grid-3">
+        <div>
+          <label for="verName">保存当前右侧文本为版本（可选命名）</label>
+          <div class="toolbar">
+            <input type="text" id="verName" placeholder="例如：第10次修改" />
+            <button class="btn" id="btnSave">保存为版本</button>
+          </div>
+          <p class="help">提示：保存时会记录时间戳与文本内容。</p>
+        </div>
+        <div>
+          <label>选择版本 A</label>
+          <select id="selectA"></select>
+          <div class="toolbar" style="margin-top:6px">
+            <button class="btn" id="loadAtoLeft">载入到左侧</button>
+          </div>
+        </div>
+        <div>
+          <label>选择版本 B</label>
+          <select id="selectB"></select>
+          <div class="toolbar" style="margin-top:6px">
+            <button class="btn" id="loadBtoRight">载入到右侧</button>
+          </div>
+        </div>
+      </div>
+      <hr class="hr" />
+      <div class="toolbar">
+        <button class="btn" id="btnCompareSelected">直接对比所选版本 A 与 B</button>
+        <button class="btn ghost" id="btnExport">导出全部版本（JSON）</button>
+        <input type="file" id="fileImport" accept="application/json" style="display:none" />
+        <button class="btn ghost" id="btnImport">导入版本库</button>
+        <button class="btn" id="btnClear" title="仅清空版本库，不影响上面文本框">清空版本库</button>
+      </div>
+      <p class="help">你可以把“第一次内容”保存为版本 A，“第10次内容”保存为版本 B，然后点击“直接对比”。</p>
+    </div>
+
+    <div class="footer">⚠️ 数据仅保存在本地浏览器。换电脑或清理浏览器数据会丢失，建议不定期“导出 JSON”做备份。</div>
+  </div>
+
+<script>
+(function(){
+  const LS_KEY = 'simple_text_versions_v1';
+  const $ = (id) => document.getElementById(id);
+  const left = $('left');
+  const right = $('right');
+  const diffBox = $('diff');
+  const addedCountEl = $('addedCount');
+  const removedCountEl = $('removedCount');
+  const blockCountEl = $('blockCount');
+  const granularity = $('granularity');
+  const ignoreCase = $('ignoreCase');
+  const ignoreWhitespace = $('ignoreWhitespace');
+  const selectA = $('selectA');
+  const selectB = $('selectB');
+
+  function fmtTime(ts){
+    const d = new Date(ts);
+    const pad = (n) => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function loadStore(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+    catch { return []; }
+  }
+  function saveStore(list){
+    localStorage.setItem(LS_KEY, JSON.stringify(list));
+    refreshSelects();
+  }
+  function refreshSelects(){
+    const list = loadStore();
+    function fill(sel){
+      sel.innerHTML = '';
+      if(list.length === 0){
+        const o = document.createElement('option');
+        o.textContent = '（暂无版本）'; o.value = '';
+        sel.appendChild(o); return;
+      }
+      list.slice().reverse().forEach(v => {
+        const o = document.createElement('option');
+        o.value = v.id;
+        o.textContent = `${v.title || '未命名'} · ${fmtTime(v.ts)}`;
+        sel.appendChild(o);
+      });
+    }
+    fill(selectA); fill(selectB);
+  }
+
+  function getVersionById(id){
+    if(!id) return null;
+    const list = loadStore();
+    return list.find(v=>v.id===id) || null;
+  }
+
+  function tokenizeWords(str){
+    return str.split(/(\s+)/); // 保留空白用于渲染
+  }
+
+  function computeDiff(a, b){
+    const opts = { ignoreCase: !!ignoreCase.checked, ignoreWhitespace: !!ignoreWhitespace.checked };
+    let parts;
+    switch(granularity.value){
+      case 'lines': parts = Diff.diffLines(a,b,opts); break;
+      case 'chars': parts = Diff.diffChars(a,b,opts); break;
+      default: // words
+        // 使用 diffWords 保留中文与英文词的可读性
+        parts = Diff.diffWords(a,b,opts);
+    }
+    return parts;
+  }
+
+  function render(parts){
+    let added=0, removed=0, blocks=0;
+    const frag = document.createDocumentFragment();
+    parts.forEach(p => {
+      const span = document.createElement('span');
+      if(p.added){ span.className='added'; added += p.value.length; blocks++; }
+      else if(p.removed){ span.className='removed'; removed += p.value.length; blocks++; }
+      else { span.className='unchanged'; }
+      span.textContent = p.value;
+      frag.appendChild(span);
+    });
+    diffBox.innerHTML = '';
+    diffBox.appendChild(frag);
+    addedCountEl.textContent = added;
+    removedCountEl.textContent = removed;
+    blockCountEl.textContent = parts.filter(p=>p.added||p.removed).length;
+  }
+
+  $('btnCompare').addEventListener('click', () => {
+    render(computeDiff(left.value, right.value));
+  });
+  $('btnSwap').addEventListener('click', () => {
+    const tmp = left.value; left.value = right.value; right.value = tmp;
+  });
+
+  $('btnSave').addEventListener('click', () => {
+    const content = right.value;
+    if(!content){ alert('右侧文本为空，无法保存'); return; }
+    const name = $('verName').value.trim();
+    const list = loadStore();
+    const id = Math.random().toString(36).slice(2);
+    list.push({ id, title: name || `版本 ${list.length+1}`, content, ts: Date.now() });
+    saveStore(list);
+    $('verName').value = '';
+    alert('已保存到版本库（保存的是右侧文本）');
+  });
+
+  $('loadAtoLeft').addEventListener('click', () => {
+    const v = getVersionById(selectA.value); if(v){ left.value = v.content; }
+  });
+  $('loadBtoRight').addEventListener('click', () => {
+    const v = getVersionById(selectB.value); if(v){ right.value = v.content; }
+  });
+  $('btnCompareSelected').addEventListener('click', () => {
+    const va = getVersionById(selectA.value);
+    const vb = getVersionById(selectB.value);
+    if(!va || !vb){ alert('请选择两个有效版本'); return; }
+    left.value = va.content; right.value = vb.content;
+    render(computeDiff(left.value, right.value));
+  });
+
+  $('btnClear').addEventListener('click', () => {
+    if(confirm('确定清空本地版本库？此操作不可撤销。')){
+      saveStore([]);
+    }
+  });
+
+  $('btnExport').addEventListener('click', () => {
+    const data = JSON.stringify(loadStore(), null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'versions-backup.json'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  $('btnImport').addEventListener('click', () => $('fileImport').click());
+  $('fileImport').addEventListener('change', (e) => {
+    const f = e.target.files[0]; if(!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const list = JSON.parse(reader.result);
+        if(!Array.isArray(list)) throw new Error('格式不正确');
+        saveStore(list);
+        alert('版本库已导入');
+      } catch(err){
+        alert('导入失败：' + err.message);
+      }
+    };
+    reader.readAsText(f);
+  });
+
+  // 初始渲染
+  refreshSelects();
+})();
+</script>
+</body>
+</html>

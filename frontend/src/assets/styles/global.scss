@@ -1,0 +1,312 @@
+/**
+ * 全局样式
+ */
+@import './variables.scss';
+
+// ========== 重置样式 ==========
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include tablet {
+    font-size: 15px;
+  }
+
+  @include mobile {
+    font-size: 14px;
+  }
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $color-text-primary;
+  background-color: $color-bg-primary;
+  overflow-x: hidden;
+}
+
+// ========== 通用工具类 ==========
+
+// 容器
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+
+  @include tablet {
+    padding: 0 $spacing-sm;
+  }
+}
+
+// Flexbox 工具类
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+// 间距工具类
+.mt-sm {
+  margin-top: $spacing-sm;
+}
+.mt-md {
+  margin-top: $spacing-md;
+}
+.mt-lg {
+  margin-top: $spacing-lg;
+}
+
+.mb-sm {
+  margin-bottom: $spacing-sm;
+}
+.mb-md {
+  margin-bottom: $spacing-md;
+}
+.mb-lg {
+  margin-bottom: $spacing-lg;
+}
+
+.p-sm {
+  padding: $spacing-sm;
+}
+.p-md {
+  padding: $spacing-md;
+}
+.p-lg {
+  padding: $spacing-lg;
+}
+
+// 文本工具类
+.text-center {
+  text-align: center;
+}
+
+.text-truncate {
+  @include text-truncate;
+}
+
+.text-sm {
+  font-size: $font-size-sm;
+}
+
+.text-lg {
+  font-size: $font-size-lg;
+}
+
+.text-secondary {
+  color: $color-text-secondary;
+}
+
+.text-disabled {
+  color: $color-text-disabled;
+}
+
+// 隐藏工具类
+.hide-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none;
+
+  @include mobile {
+    display: block;
+  }
+}
+
+// ========== 通用组件样式 ==========
+
+// 按钮
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+
+  @include mobile {
+    padding: $spacing-sm;
+    font-size: $font-size-xs;
+  }
+}
+
+.btn-primary {
+  color: white;
+  background-color: $color-primary;
+  border-color: $color-primary;
+
+  &:not(:disabled):hover {
+    background-color: $color-primary-dark;
+  }
+}
+
+.btn-secondary {
+  color: $color-text-primary;
+  background-color: $color-bg-secondary;
+  border-color: $color-border;
+
+  &:not(:disabled):hover {
+    background-color: $color-bg-tertiary;
+  }
+}
+
+.btn-sm {
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-xs;
+}
+
+.btn-lg {
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-base;
+}
+
+// 输入框
+.input {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $color-text-primary;
+  background-color: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+
+  &::placeholder {
+    color: $color-text-disabled;
+  }
+
+  @include mobile {
+    font-size: $font-size-sm;
+  }
+}
+
+// 卡片
+.card {
+  background-color: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: $spacing-md;
+  border-bottom: 1px solid $color-border;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: $spacing-md;
+}
+
+.card-footer {
+  padding: $spacing-md;
+  border-top: 1px solid $color-border;
+  background-color: $color-bg-secondary;
+}
+
+// 加载状态
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 差异高亮样式
+.diff-added {
+  background-color: $color-diff-added;
+  text-decoration: underline;
+  text-decoration-color: darken($color-diff-added, 30%);
+}
+
+.diff-deleted {
+  background-color: $color-diff-deleted;
+  text-decoration: line-through;
+  text-decoration-color: darken($color-diff-deleted, 30%);
+}
+
+.diff-modified {
+  background-color: $color-diff-modified;
+  font-weight: 500;
+}
+
+// 滚动条
+* {
+  @include custom-scrollbar;
+}

@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 
+// 支持Docker环境变量配置
+const backendUrl = process.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -10,14 +13,15 @@ export default defineConfig({
     }
   },
   server: {
+    host: '0.0.0.0', // 允许Docker容器外部访问
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: backendUrl,
         changeOrigin: true
       },
       '/ws': {
-        target: 'ws://127.0.0.1:8000',
+        target: backendUrl.replace('http', 'ws'),
         ws: true
       }
     }

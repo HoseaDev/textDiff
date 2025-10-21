@@ -54,3 +54,12 @@ Thumbs.db
 .cache/
 *.tmp
 backend/.deps_installed
+
+# Docker
+.env
+.env.*
+!.env.example
+docker-compose.override.yml
+*.backup
+backup_*.sql
+backup_*.tar.gz

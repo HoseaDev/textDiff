@@ -54,16 +54,6 @@ if [ ! -f .env ]; then
     fi
 fi
 
-# 检查并生成 package-lock.json
-if [ ! -f frontend/package-lock.json ]; then
-    echo ""
-    echo -e "${YELLOW}package-lock.json 不存在，正在生成...${NC}"
-    cd frontend
-    npm install --package-lock-only
-    cd ..
-    echo -e "${GREEN}package-lock.json 已生成${NC}"
-fi
-
 # 部署模式选择
 echo "请选择部署模式："
 echo "1) 生产环境 (Production)"
